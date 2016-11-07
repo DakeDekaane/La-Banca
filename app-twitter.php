@@ -2,42 +2,62 @@
 class Twitter{
 
   function getTweets($user){
-    ini_set('display_errors', 1);
-    require_once('TwitterAPIExchange.php');
-
-    $settings = array(
-        'oauth_access_token' => "90791365-3fruHkZqRdxF83Xy7NGoHzO3jbM6Sd07TcnAomqO8",
-        'oauth_access_token_secret' => "EYLspCOJGmBFndxWtbWl0oDGjU8WLnfyZDufHeXN5sWyw",
-        'consumer_key' => "dEar1nKJWGcxR2mH7VesbfuZ7",
-        'consumer_secret' => "lU6r9uXAt1ZyDLRFoC8lpKteAfVPG5H3FALtyv3ACjxTHluNhU"
+    //This is all you need to configure.
+    $app_key = 'dEar1nKJWGcxR2mH7VesbfuZ7';
+    $app_token = 'lU6r9uXAt1ZyDLRFoC8lpKteAfVPG5H3FALtyv3ACjxTHluNhU';
+    //These are our constants.
+    $api_base = 'https://api.twitter.com/';
+    $bearer_token_creds = base64_encode($app_key.':'.$app_token);
+    //Get a bearer token.
+    $opts = array(
+      'http'=>array(
+        'method' => 'POST',
+        'header' => 'Authorization: Basic '.'ZEVhcjFuS0pXR2N4UjJtSDdWZXNiZnVaNzpsVTZyOXVYQXQxWnlETFJGb0M4bHBLdGVBZlZQRzVIM0ZBTHR5djNBQ2p4VEhsdU5oVQ=='."\r\n".
+                   'Content-Type: application/x-www-form-urlencoded;charset=UTF-8',
+        'content' => 'grant_type=client_credentials'
+      )
     );
-
-    $url = 'https://api.twitter.com/1.1/statuses/user_timeline.json';
-    $getfield = '?screen_name='.$user.'&count=5';        
-    $requestMethod = 'GET';
-    $twitter = new TwitterAPIExchange($settings);
-    $json =  $twitter->setGetfield($getfield)
-                 ->buildOauth($url, $requestMethod)
-                 ->performRequest();
+    $context = stream_context_create($opts);
+    $json = file_get_contents($api_base.'oauth2/token',false,$context);
+    $result = json_decode($json,true);
+    if (!is_array($result) || !isset($result['token_type']) || !isset($result['access_token'])) {
+      die("Something went wrong. This isn't a valid array: ".$json);
+    }
+    if ($result['token_type'] !== "bearer") {
+      die("Invalid token type. Twitter says we need to make sure this is a bearer.");
+    }
+    //Set our bearer token. Now issued, this won't ever* change unless it's invalidated by a call to /oauth2/invalidate_token.
+    //*probably - it's not documentated that it'll ever change.
+    $bearer_token = $result['access_token'];
+    //Try a twitter API request now.
+    $opts = array(
+      'http'=>array(
+        'method' => 'GET',
+        'header' => 'Authorization: Bearer '.$bearer_token
+      )
+    );
+    $context = stream_context_create($opts);
+    $json = file_get_contents($api_base.'1.1/statuses/user_timeline.json?count=5&screen_name='.$user,false,$context);
+    
     return $json;
 
   }
 
   function getArrayTweets($jsonraw){
     $rawdata = "";
-    $json = json_decode($jsonraw);
+    $json = json_decode($jsonraw,true);
+    
     $num_items = count($json);
     for($i=0; $i<$num_items; $i++){
 
-      $user = $json[$i];
+      $url_image = $json[$i]["user"]["profile_image_url"];
+      $name = $json[$i]["user"]["name"];
+      $screen_name = $json[$i]["user"]["screen_name"];
+      $fecha = $json[$i]["created_at"];
+      $tweet = $json[$i]["text"];
 
-      $url_imagen = $user->user->profile_image_url;
-      $name = $user->user->name;
-      $screen_name = $user->user->screen_name;
-      $fecha = $user->created_at;
-      $tweet = $user->text;
 
-      $imagen = "<a href='https://twitter.com/".$screen_name."' target=_blank><img src=".$url_imagen."></img></a>";
+      $imagen = "<a href='https://twitter.com/".$screen_name."' target=_blank><img src=".$url_image ."></img></a>";
       $name = "<a href='https://twitter.com/".$screen_name."' target=_blank>".$name."</a>";
 
       $rawdata[$i]["imagen"]=$imagen;
