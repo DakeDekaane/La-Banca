@@ -1,0 +1,87 @@
+body {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+}
+
+main {
+  flex: 1 0 auto;
+  margin-bottom: 0px;
+}
+
+footer{ 
+  margin-top: 0px;
+}
+
+.greeting {
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+#modal-login {
+  width: 30% !important;
+}
+
+.header{
+  color: #FFAB00;
+}
+
+.tabs .indicator {
+    background-color: #FFAB00;
+}
+
+.btn-table {
+  width: 160px;
+}
+
+.sidepanel-title {
+  margin-bottom: 0px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  text-align: center;
+  font-size: 24px;
+}
+
+.twitter-container {
+  margin-top: 0px;
+}
+
+.twits {
+  margin-bottom: -3px;
+}
+
+.twit-header {
+  margin: 0px;
+  padding: 2px; 
+}
+
+.twit-image {
+  margin: 0px;
+  padding: 8px;
+}
+
+.twit-name {
+  margin: 0px;
+  padding: 2px 3px 0px 3px;
+  font-size: 13px;
+  color: black;
+}
+
+.twit-username {
+  margin: 0px;
+  padding: 0px 3px 0px 3px;
+  font-size: 12px;
+}
+
+.twit-date {
+  margin: 0px;
+  padding: 0px 5px 2px 5px;
+  font-size: 10px;
+}
+
+.twit-body {
+  margin: 0px;
+  padding: 2px 7px 7px 7px;
+  font-size: 12px;
+}
+
